@@ -1286,26 +1286,26 @@ export class Renderer {
 
 		// PREPARE 
 		if (target != null) {
-			this.threeRenderer.setRenderTarget(target);
+			// this.threeRenderer.setRenderTarget(target);
 		}
 
-		camera.updateProjectionMatrix();
+		// camera.updateProjectionMatrix();
 
-		const traversalResult = this.traverse(scene);
-
-
-		// RENDER
-		for (const octree of traversalResult.octrees) {
-			let nodes = octree.visibleNodes;
-			this.renderOctree(octree, nodes, camera, target, params);
-		}
+		// const traversalResult = this.traverse(scene);
 
 
-		// CLEANUP
-		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, null)
+		// // RENDER
+		// for (const octree of traversalResult.octrees) {
+		// 	let nodes = octree.visibleNodes;
+		// 	this.renderOctree(octree, nodes, camera, target, params);
+		// }
 
-		this.threeRenderer.state.reset();
+
+		// // CLEANUP
+		// gl.activeTexture(gl.TEXTURE1);
+		// gl.bindTexture(gl.TEXTURE_2D, null)
+
+		// this.threeRenderer.state.reset();
 	}
 
 

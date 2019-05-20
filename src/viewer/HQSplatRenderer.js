@@ -89,8 +89,10 @@ export class HQSplatRenderer{
 		let camera = viewer.scene.getActiveCamera();
 		
 		viewer.renderer.setClearColor(0x000000, 0);
-		viewer.renderer.clearTarget( this.rtDepth, true, true, true );
-		viewer.renderer.clearTarget( this.rtAttribute, true, true, true );
+		viewer.renderer.setRenderTarget(this.rtDepth);
+		viewer.renderer.clear();
+		viewer.renderer.setRenderTarget(this.rtAttribute);
+		viewer.renderer.clear();
 
 		let width = viewer.renderer.getSize().width;
 		let height = viewer.renderer.getSize().height;

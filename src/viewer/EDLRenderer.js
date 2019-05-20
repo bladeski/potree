@@ -58,7 +58,10 @@ export class EDLRenderer{
 		const viewer = this.viewer;
 
 		let pixelRatio = viewer.renderer.getPixelRatio();
-		let {width, height} = viewer.renderer.getSize();
+		let renderArea = new THREE.Vector2();
+		viewer.renderer.getSize(renderArea);
+		let width = renderArea.width;
+		let height = renderArea.height;
 
 		if(this.screenshot){
 			width = this.screenshot.target.width;
@@ -94,7 +97,8 @@ export class EDLRenderer{
 			target: target
 		};
 
-		this.viewer.renderer.clearTarget(target, true, true, true);
+		this.viewer.renderer.setRenderTarget(target);
+		this.viewer.renderer.clear();
 
 		this.render();
 
@@ -200,15 +204,16 @@ export class EDLRenderer{
 			viewer.shadowTestCam.updateProjectionMatrix();
 
 		}
-
-		//viewer.renderer.render(viewer.scene.scene, camera);
 		
-		//viewer.renderer.clearTarget( this.rtColor, true, true, true );
-		viewer.renderer.clearTarget(this.rtEDL, true, true, true);
-		viewer.renderer.clearTarget(this.rtRegular, true, true, false);
+		// viewer.renderer.setRenderTarget(this.rtEDL);
+		// viewer.renderer.clear();
+		viewer.renderer.setRenderTarget(this.rtRegular);
+		viewer.renderer.clear(true, true, false);
 
-		let width = viewer.renderer.getSize().width;
-		let height = viewer.renderer.getSize().height;
+		let renderArea = new THREE.Vector2();
+		viewer.renderer.getSize(renderArea);
+		let width = renderArea.width;
+		let height = renderArea.height;
 
 		// COLOR & DEPTH PASS
 		for (let pointcloud of viewer.scene.pointclouds) {

@@ -1132,13 +1132,12 @@ export class Viewer extends EventDispatcher{
 		this.scene.annotations.updateBounds();
 		this.scene.cameraP.updateMatrixWorld();
 		this.scene.cameraO.updateMatrixWorld();
-		
-		let distances = [];
 
-		let renderAreaWidth = this.renderer.getSize().width;
-		let renderAreaHeight = this.renderer.getSize().height;
+		let renderArea = new THREE.Vector2();
+		this.renderer.getSize(renderArea);
 
-		let viewer = this;
+		let renderAreaWidth = renderArea.width;
+		let renderAreaHeight = renderArea.height;
 
 		let visibleNow = [];
 		this.scene.annotations.traverse(annotation => {
@@ -1161,7 +1160,7 @@ export class Viewer extends EventDispatcher{
 				position = annotation.boundingBox.getCenter(new THREE.Vector3());
 			}
 
-			let distance = viewer.scene.cameraP.position.distanceTo(position);
+			let distance = this.scene.cameraP.position.distanceTo(position);
 			let radius = annotation.boundingBox.getBoundingSphere(new THREE.Sphere()).radius;
 
 			let screenPos = new THREE.Vector3();
@@ -1175,13 +1174,13 @@ export class Viewer extends EventDispatcher{
 
 
 				// SCREEN SIZE
-				if(viewer.scene.cameraMode == CameraMode.PERSPECTIVE) {
-					let fov = Math.PI * viewer.scene.cameraP.fov / 180;
+				if(this.scene.cameraMode == CameraMode.PERSPECTIVE) {
+					let fov = Math.PI * this.scene.cameraP.fov / 180;
 					let slope = Math.tan(fov / 2.0);
 					let projFactor =  0.5 * renderAreaHeight / (slope * distance);
 					screenSize = radius * projFactor;
 				} else {
-					screenSize = Utils.projectedRadiusOrtho(radius, viewer.scene.cameraO.projectionMatrix, renderAreaWidth, renderAreaHeight);
+					screenSize = Utils.projectedRadiusOrtho(radius, this.scene.cameraO.projectionMatrix, renderAreaWidth, renderAreaHeight);
 				}
 			}
 
@@ -1641,29 +1640,6 @@ export class Viewer extends EventDispatcher{
 			}
 		}
 
-		//if(this.useRep){
-		//	if (!this.repRenderer) {
-		//		this.repRenderer = new RepRenderer(this);
-		//	}
-		//	this.repRenderer.render(this.renderer);
-		//} else if (this.useHQ && Features.SHADER_SPLATS.isSupported()) {
-		//	if (!this.hqRenderer) {
-		//		this.hqRenderer = new HQSplatRenderer(this);
-		//	}
-		//	this.hqRenderer.render(this.renderer);
-		//} else if (this.useEDL && Features.SHADER_EDL.isSupported()) {
-		//	if (!this.edlRenderer) {
-		//		this.edlRenderer = new EDLRenderer(this);
-		//	}
-		//	this.edlRenderer.render(this.renderer);
-		//} else {
-		//	if (!this.potreeRenderer) {
-		//		this.potreeRenderer = new PotreeRenderer(this);
-		//	}
-
-		//	this.potreeRenderer.render();
-		//}
-
 		this.renderer.render(this.overlay, this.overlayCamera);
 
 		}catch(e){
@@ -1779,7 +1755,6 @@ export class Viewer extends EventDispatcher{
 	loop(timestamp){
 		requestAnimationFrame(this.loop.bind(this));
 
-		let queryAll;
 		if(Potree.measureTimings){
 			performance.mark("loop-start");
 		}

@@ -109,8 +109,10 @@ export class ProfileTool extends EventDispatcher {
 	update(){
 		let camera = this.viewer.scene.getActiveCamera();
 		let profiles = this.viewer.scene.profiles;
-		let clientWidth = this.renderer.getSize().width;
-		let clientHeight = this.renderer.getSize().height;
+		let renderArea = new THREE.Vector2();
+		this.renderer.getSize(renderArea);
+		let clientWidth = renderArea.width;
+		let clientHeight = renderArea.height;
 
 		this.light.position.copy(camera.position);
 

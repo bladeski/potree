@@ -15,16 +15,9 @@ export class PointCloudSM{
 		this.target.depthTexture = new THREE.DepthTexture();
 		this.target.depthTexture.type = THREE.UnsignedIntType;
 
-		//this.target = new THREE.WebGLRenderTarget(1024, 1024, {
-		//	minFilter: THREE.NearestFilter,
-		//	magFilter: THREE.NearestFilter,
-		//	format: THREE.RGBAFormat,
-		//	type: THREE.FloatType,
-		//	depthTexture: new THREE.DepthTexture(undefined, undefined, THREE.UnsignedIntType)
-		//});
-
 		this.threeRenderer.setClearColor(0x000000, 1);
-		this.threeRenderer.clearTarget(this.target, true, true, true);
+		this.threeRenderer.setRenderTarget(this.target);
+		this.threeRenderer.clear();
 	}
 
 	setLight(light){
@@ -56,8 +49,8 @@ export class PointCloudSM{
 
 	render(scene, camera){
 		//this.threeRenderer.setClearColor(0x00ff00, 1);
-
-		this.threeRenderer.clearTarget( this.target, true, true, true );
+		this.threeRenderer.setRenderTarget(this.target);
+		this.threeRenderer.clear();
 		this.potreeRenderer.render(scene, this.camera, this.target, {});
 	}
 

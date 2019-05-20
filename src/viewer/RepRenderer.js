@@ -146,8 +146,10 @@ class RepRenderer {
 		
 		viewer.renderer.render(viewer.scene.scene, camera);
 		
-		viewer.renderer.clearTarget( this.rtShadow, true, true, true );
-		viewer.renderer.clearTarget( this.rtColor, true, true, true );
+		viewer.renderer.setRenderTarget(this.rtShadow);
+		viewer.renderer.clear();
+		viewer.renderer.setRenderTarget(this.rtColor);
+		viewer.renderer.clear();
 		
 		let width = viewer.renderArea.clientWidth;
 		let height = viewer.renderArea.clientHeight;
@@ -211,8 +213,8 @@ class RepRenderer {
 				snap.target.setSize(width, height);
 			}
 
-			viewer.renderer.clearTarget(snap.target, true, true, true);
 			viewer.renderer.setRenderTarget(snap.target);
+			viewer.renderer.cleart();
 
 
 			for(const octree of viewer.scene.pointclouds){
@@ -250,8 +252,8 @@ class RepRenderer {
 
 			let query = Potree.startQuery('render snapshots', viewer.renderer.getContext());
 
-			viewer.renderer.clearTarget(this.rtColor, true, true, true);
 			viewer.renderer.setRenderTarget(this.rtColor);
+			viewer.renderer.clear();
 			for(const octree of viewer.scene.pointclouds){
 
 				if(!this.disableSnapshots){
