@@ -116,8 +116,10 @@ Potree.VolumeTool = class VolumeTool extends THREE.EventDispatcher {
 		}
 		
 		let camera = this.viewer.scene.getActiveCamera();
-		let clientWidth = this.viewer.renderer.getSize().width;
-		let clientHeight = this.viewer.renderer.getSize().height;
+		let size = new THREE.Vector2();
+		this.viewer.renderer.getSize(size);
+		let clientWidth = size.width;
+		let clientHeight = size.height;
 
 		let volumes = this.viewer.scene.volumes;
 		for (let volume of volumes) {
@@ -137,8 +139,13 @@ Potree.VolumeTool = class VolumeTool extends THREE.EventDispatcher {
 		}
 	}
 
-	render(params){
-		this.viewer.renderer.render(this.scene, this.viewer.scene.getActiveCamera(), params.renderTarget);
+	render(params) {
+		if (params.renderTarget) {
+			this.viewer.renderer.setRenderTarget(params.renderTarget);
+			this.viewer.renderer.clear();
+		}
+		this.viewer.renderer.render(this.scene, this.viewer.scene.getActiveCamera());
+		this.viewer.renderer.setRenderTarget(null);
 	}
 
 };

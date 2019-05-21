@@ -557,10 +557,10 @@ Potree.updateVisibility = function(pointclouds, camera, renderer){
 		visible = visible && level < maxLevel;
 
 
-		if(!window.warned125){
-			console.log("TODO");
-			window.warned125 = true;
-		}
+		// if(!window.warned125){
+		// 	console.log("TODO");
+		// 	window.warned125 = true;
+		// }
 		if(false && pointcloud.material.clipBoxes.length > 0){
 
 			

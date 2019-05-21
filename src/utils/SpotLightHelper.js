@@ -59,7 +59,7 @@ Potree.SpotLightHelper = class SpotLightHelper extends THREE.Object3D{
 		//	light.position,
 		//	new THREE.Vector3().subVectors(light.position, this.light.getWorldDirection()));
 		let target = new THREE.Vector3().addVectors(
-			light.position, this.light.getWorldDirection().multiplyScalar(-1));
+			light.position, this.light.getWorldDirection(new THREE.Vector3()).multiplyScalar(-1));
 		
 		let quat = new THREE.Quaternion().setFromRotationMatrix(
 			new THREE.Matrix4().lookAt( position, target, new THREE.Vector3( 0, 0, 1 ) )

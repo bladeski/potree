@@ -71,6 +71,7 @@ class PotreeRenderer {
 		viewer.renderer.setViewport(0, 0, viewer.renderer.domElement.clientWidth, viewer.renderer.domElement.clientHeight);
 
 		viewer.dispatchEvent({type: "render.pass.end",viewer: viewer});
+		viewer.renderer.setRenderTarget(null);
 		
 		Potree.endQuery(query, viewer.renderer.getContext());
 	};

@@ -53,15 +53,16 @@ class EDLRenderer{
 		const viewer = this.viewer;
 
 		let pixelRatio = viewer.renderer.getPixelRatio();
-		let {width, height} = viewer.renderer.getSize();
+		let size = new THREE.Vector2();
+		viewer.renderer.getSize(size);
 
 		if(this.screenshot){
-			width = this.screenshot.target.width;
-			height = this.screenshot.target.height;
+			size.width = this.screenshot.target.width;
+			size.height = this.screenshot.target.height;
 		}
 
-		this.rtEDL.setSize(width * pixelRatio , height * pixelRatio);
-		this.rtRegular.setSize(width * pixelRatio , height * pixelRatio);
+		this.rtEDL.setSize(size.width * pixelRatio, size.height * pixelRatio);
+		this.rtRegular.setSize(size.width * pixelRatio, size.height * pixelRatio);
 	}
 
 	makeScreenshot(camera, size, callback){
@@ -71,7 +72,8 @@ class EDLRenderer{
 		}
 
 		if(size === undefined || size === null){
-			size = this.viewer.renderer.getSize();
+			size = new THREE.Vector2();
+			this.viewer.renderer.getSize(size);
 		}
 
 		let {width, height} = size;
@@ -89,7 +91,8 @@ class EDLRenderer{
 			target: target
 		};
 
-		this.viewer.renderer.clearTarget(target, true, true, true);
+		this.viewer.renderer.setRenderTarget(target);
+		this.viewer.renderer.clear();
 
 		this.render();
 
@@ -122,6 +125,7 @@ class EDLRenderer{
 	render(){
 		this.initEDL();
 		const viewer = this.viewer;
+		const target = viewer.renderer.getRenderTarget();
 
 		viewer.dispatchEvent({type: "render.pass.begin",viewer: viewer});
 
@@ -189,6 +193,7 @@ class EDLRenderer{
 			}
 
 			this.shadowMap.render(viewer.scene.scenePointCloud, camera);
+			//this.shadowMap.setRenderTarget(null);
 
 			for(let pointcloud of viewer.scene.pointclouds){
 				let originalAttribute = originalAttributes.get(pointcloud);
@@ -208,15 +213,19 @@ class EDLRenderer{
 		viewer.renderer.render(viewer.scene.scene, camera);
 		
 		//viewer.renderer.clearTarget( this.rtColor, true, true, true );
-		viewer.renderer.clearTarget(this.rtEDL, true, true, true);
-		viewer.renderer.clearTarget(this.rtRegular, true, true, false);
+		viewer.renderer.setRenderTarget(this.rtEDL);
+		viewer.renderer.clear();
+		viewer.renderer.setRenderTarget(this.rtRegular);
+		viewer.renderer.clear(true, true, false);
 
-		let width = viewer.renderer.getSize().width;
-		let height = viewer.renderer.getSize().height;
+		let size = new THREE.Vector2();
+		viewer.renderer.getSize(size);
+		let width = size.width;
+		let height = size.height;
 
 		// COLOR & DEPTH PASS
 		for (let pointcloud of viewer.scene.pointclouds) {
-			let octreeSize = pointcloud.pcoGeometry.boundingBox.getSize().x;
+			let octreeSize = pointcloud.pcoGeometry.boundingBox.getSize(new THREE.Vector3()).x;
 
 			let material = pointcloud.material;
 			material.weighted = false;
@@ -242,7 +251,8 @@ class EDLRenderer{
 			});
 		}
 
-		viewer.renderer.render(viewer.scene.scene, camera, this.rtRegular);
+		viewer.renderer.setRenderTarget(target);
+		viewer.renderer.render(viewer.scene.scene, camera);
 
 		//viewer.renderer.setRenderTarget(this.rtColor);
 		viewer.dispatchEvent({type: "render.pass.scene", viewer: viewer, renderTarget: this.rtRegular});
@@ -292,6 +302,7 @@ class EDLRenderer{
 									viewer.navigationCube.width, viewer.navigationCube.width);
 		viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);		
 		viewer.renderer.setViewport(0, 0, width, height);
+		viewer.renderer.setRenderTarget(null);
 
 		viewer.dispatchEvent({type: "render.pass.end",viewer: viewer});
 

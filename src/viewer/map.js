@@ -661,7 +661,7 @@ Potree.MapView = class {
 		}
 
 		// resize
-		let mapSize = this.map.getSize();
+		let mapSize = this.map.getSize(new THREE.Vector3());
 		let resized = (pm.width() !== mapSize[0] || pm.height() !== mapSize[1]);
 		if (resized) {
 			this.map.updateSize();
@@ -672,7 +672,7 @@ Potree.MapView = class {
 
 		let scale = this.map.getView().getResolution();
 		let campos = camera.position;
-		let camdir = camera.getWorldDirection();
+		let camdir = camera.getWorldDirection(new THREE.Vector3());
 		let sceneLookAt = camdir.clone().multiplyScalar(30 * scale).add(campos);
 		let geoPos = camera.position;
 		let geoLookAt = sceneLookAt;

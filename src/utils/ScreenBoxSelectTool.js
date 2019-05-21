@@ -1,7 +1,7 @@
 
-Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispatcher{
+Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispatcher {
 
-	constructor(viewer){
+	constructor(viewer) {
 		super();
 
 		this.viewer = viewer;
@@ -12,11 +12,11 @@ Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispat
 		viewer.addEventListener("scene_changed", this.onSceneChange.bind(this));
 	}
 
-	onSceneChange(scene){
+	onSceneChange(scene) {
 		console.log("scene changed");
 	}
 
-	startInsertion(){
+	startInsertion() {
 		let domElement = this.viewer.renderer.domElement;
 
 		let volume = new Potree.Volume();
@@ -33,7 +33,7 @@ Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispat
 		selectionBox.css("right", "10px");
 		selectionBox.css("bottom", "10px");
 
-		let drag = e =>{
+		let drag = e => {
 
 			volume.visible = true;
 
@@ -50,11 +50,10 @@ Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispat
 			selectionBox.css("height", `${box2D.max.y - box2D.min.y}px`);
 
 			let camera = e.viewer.scene.getActiveCamera();
-			let size = new THREE.Vector2(
-				e.viewer.renderer.getSize().width,
-				e.viewer.renderer.getSize().height);
+			let size = new THREE.Vector2();
+			e.viewer.renderer.getSize(size);
 			let frustumSize = new THREE.Vector2(
-				camera.right - camera.left, 
+				camera.right - camera.left,
 				camera.top - camera.bottom);
 
 			let screenCentroid = new THREE.Vector2().addVectors(e.drag.end, e.drag.start).multiplyScalar(0.5);
@@ -80,9 +79,8 @@ Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispat
 			this.viewer.inputHandler.toggleSelection(volume);
 
 			let camera = e.viewer.scene.getActiveCamera();
-			let size = new THREE.Vector2(
-				e.viewer.renderer.getSize().width,
-				e.viewer.renderer.getSize().height);
+			let size = new THREE.Vector2();
+			e.viewer.renderer.getSize(size);
 			let screenCentroid = new THREE.Vector2().addVectors(e.drag.end, e.drag.start).multiplyScalar(0.5);
 			let ray = Potree.utils.mouseToRay(screenCentroid, camera, size.width, size.height);
 
@@ -95,14 +93,14 @@ Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispat
 			let allPointsFar = [];
 
 			// TODO support more than one point cloud
-			for(let pointcloud of this.viewer.scene.pointclouds){
+			for (let pointcloud of this.viewer.scene.pointclouds) {
 
-				if(!pointcloud.visible){
+				if (!pointcloud.visible) {
 					continue;
 				}
 
 				let volCam = camera.clone();
-				volCam.left = -volume.scale.x / 2; 
+				volCam.left = -volume.scale.x / 2;
 				volCam.right = +volume.scale.x / 2;
 				volCam.top = +volume.scale.y / 2;
 				volCam.bottom = -volume.scale.y / 2;
@@ -116,19 +114,20 @@ Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispat
 				volCam.updateProjectionMatrix();
 				volCam.matrixWorldInverse.getInverse(volCam.matrixWorld);
 
-				let ray = new THREE.Ray(volCam.getWorldPosition(), volCam.getWorldDirection());
+				let ray = new THREE.Ray(volCam.getWorldPosition(), volCam.getWorldDirection(new THREE.Vector3()));
 				let rayInverse = new THREE.Ray(
 					ray.origin.clone().add(ray.direction.clone().multiplyScalar(volume.scale.z)),
 					ray.direction.clone().multiplyScalar(-1));
 
 				let pickerSettings = {
-					width: 8, 
-					height: 8, 
-					pickWindowSize: 8, 
+					width: 8,
+					height: 8,
+					pickWindowSize: 8,
 					all: true,
 					pickClipped: true,
 					pointSizeType: Potree.PointSizeType.FIXED,
-					pointSize: 1};
+					pointSize: 1
+				};
 				let pointsNear = pointcloud.pick(viewer, volCam, ray, pickerSettings);
 
 				volCam.rotateX(Math.PI);
@@ -142,14 +141,14 @@ Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispat
 				allPointsFar.push(...pointsFar);
 			}
 
-			if(allPointsNear.length > 0 && allPointsFar.length > 0){
+			if (allPointsNear.length > 0 && allPointsFar.length > 0) {
 				let viewLine = new THREE.Line3(ray.origin, new THREE.Vector3().addVectors(ray.origin, ray.direction));
 
 				let closestOnLine = allPointsNear.map(p => viewLine.closestPointToPoint(p.position, false));
-				let closest = closestOnLine.sort( (a, b) => ray.origin.distanceTo(a) - ray.origin.distanceTo(b))[0];
+				let closest = closestOnLine.sort((a, b) => ray.origin.distanceTo(a) - ray.origin.distanceTo(b))[0];
 
 				let farthestOnLine = allPointsFar.map(p => viewLine.closestPointToPoint(p.position, false));
-				let farthest = farthestOnLine.sort( (a, b) => ray.origin.distanceTo(b) - ray.origin.distanceTo(a))[0];
+				let farthest = farthestOnLine.sort((a, b) => ray.origin.distanceTo(b) - ray.origin.distanceTo(a))[0];
 
 				let distance = closest.distanceTo(farthest);
 				let centroid = new THREE.Vector3().addVectors(closest, farthest).multiplyScalar(0.5);
@@ -168,12 +167,13 @@ Potree.ScreenBoxSelectTool = class ScreenBoxSelectTool extends THREE.EventDispat
 		return volume;
 	}
 
-	update(e){
+	update(e) {
 		//console.log(e.delta)
 	}
 
-	render(){
+	render() {
 		this.viewer.renderer.render(this.scene, this.viewer.scene.getActiveCamera());
+		this.viewer.renderer.setRenderTarget(null);
 	}
 
-}
+};

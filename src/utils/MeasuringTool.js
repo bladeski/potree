@@ -1,4 +1,3 @@
-
 Potree.MeasuringTool = class MeasuringTool extends THREE.EventDispatcher {
 	constructor (viewer) {
 		super();
@@ -112,8 +111,10 @@ Potree.MeasuringTool = class MeasuringTool extends THREE.EventDispatcher {
 		let domElement = this.renderer.domElement;
 		let measurements = this.viewer.scene.measurements;
 
-		let clientWidth = this.renderer.getSize().width;
-		let clientHeight = this.renderer.getSize().height;
+		let size = new THREE.Vector2();
+		this.renderer.getSize(size);
+		let clientWidth = size.width;
+		let clientHeight = size.height;
 
 		this.light.position.copy(camera.position);
 
@@ -228,5 +229,6 @@ Potree.MeasuringTool = class MeasuringTool extends THREE.EventDispatcher {
 
 	render(){
 		this.viewer.renderer.render(this.scene, this.viewer.scene.getActiveCamera());
+		this.viewer.renderer.setRenderTarget(null);
 	}
 };

@@ -622,10 +622,10 @@ Potree.utils.screenPass = new function () {
 	this.render = function (renderer, material, target) {
 		this.screenQuad.material = material;
 
-		if (typeof target === 'undefined') {
-			renderer.render(this.screenScene, this.camera);
-		} else {
-			renderer.render(this.screenScene, this.camera, target);
+		if (typeof target !== 'undefined') {
+			renderer.setRenderTarget(target);
 		}
+
+		renderer.render(this.screenScene, this.camera);
 	};
 }();

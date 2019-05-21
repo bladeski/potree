@@ -148,7 +148,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 			
 			let onPointcloudAdded = (e) => {
 				if (this.scene.pointclouds.length === 1) {
-					let speed = e.pointcloud.boundingBox.getSize().length();
+					let speed = e.pointcloud.boundingBox.getSize(new THREE.Vector3()).length();
 					speed = speed / 5;
 					this.setMoveSpeed(speed);
 				}
@@ -556,7 +556,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 		} else if (node.geometry && node.geometry.boundingSphere) {
 			bs = node.geometry.boundingSphere;
 		} else {
-			bs = node.boundingBox.getBoundingSphere();
+			bs = node.boundingBox.getBoundingSphere(new THREE.Sphere());
 		}
 		bs = bs.clone().applyMatrix4(node.matrixWorld); 
 
@@ -993,8 +993,10 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 		
 		let distances = [];
 
-		let renderAreaWidth = this.renderer.getSize().width;
-		let renderAreaHeight = this.renderer.getSize().height;
+		let size = new THREE.Vector2();
+		this.renderer.getSize(size);
+		let renderAreaWidth = size.width;
+		let renderAreaHeight = size.height;
 
 		let viewer = this;
 
@@ -1146,7 +1148,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 		Potree.pointLoadLimit = Potree.pointBudget * 2;
 
 		this.scene.directionalLight.position.copy(camera.position);
-		this.scene.directionalLight.lookAt(new THREE.Vector3().addVectors(camera.position, camera.getWorldDirection()));
+		this.scene.directionalLight.lookAt(new THREE.Vector3().addVectors(camera.position, camera.getWorldDirection(new THREE.Vector3())));
 
 		for (let pointcloud of this.scene.pointclouds) {
 			if (!pointcloud.material._defaultIntensityRangeChanged) {
@@ -1450,6 +1452,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 		//}
 
 		this.renderer.render(this.overlay, this.overlayCamera);
+		this.renderer.setRenderTarget(null);
 
 		}catch(e){
 			this.onCrash(e);

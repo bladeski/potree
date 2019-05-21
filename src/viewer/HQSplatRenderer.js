@@ -63,8 +63,10 @@ class HQSplatRenderer {
 		const viewer = this.viewer;
 
 		let pixelRatio = viewer.renderer.getPixelRatio();
-		let width = viewer.renderer.getSize().width;
-		let height = viewer.renderer.getSize().height;
+		let size = new THREE.Vector2();
+		viewer.renderer.getSize(size);
+		let width = size.width;
+		let height = size.height;
 		this.rtDepth.setSize(width * pixelRatio , height * pixelRatio);
 		this.rtAttribute.setSize(width * pixelRatio , height * pixelRatio);
 	}
@@ -80,11 +82,15 @@ class HQSplatRenderer {
 		let camera = viewer.scene.getActiveCamera();
 		
 		viewer.renderer.setClearColor(0x000000, 0);
-		viewer.renderer.clearTarget( this.rtDepth, true, true, true );
-		viewer.renderer.clearTarget( this.rtAttribute, true, true, true );
+		viewer.renderer.setRenderTarget(this.rtDepth);
+		viewer.renderer.clear();
+		viewer.renderer.setRenderTarget(this.rtAttribute);
+		viewer.renderer.clear();
 
-		let width = viewer.renderer.getSize().width;
-		let height = viewer.renderer.getSize().height;
+		let size = new THREE.Vector2();
+		viewer.renderer.getSize(size);
+		let width = size.width;
+		let height = size.height;
 
 		let queryHQSplats = Potree.startQuery('HQSplats', viewer.renderer.getContext());
 
@@ -111,7 +117,7 @@ class HQSplatRenderer {
 
 		{ // DEPTH PASS
 			for (let pointcloud of visiblePointClouds) {
-				let octreeSize = pointcloud.pcoGeometry.boundingBox.getSize().x;
+				let octreeSize = pointcloud.pcoGeometry.boundingBox.getSize(new THREE.Vector3()).x;
 
 				let material = originalMaterials.get(pointcloud);
 				let depthMaterial = this.depthMaterials.get(pointcloud);
@@ -139,14 +145,12 @@ class HQSplatRenderer {
 				pointcloud.material = depthMaterial;
 			}
 			
-			viewer.pRenderer.render(viewer.scene.scenePointCloud, camera, this.rtDepth, {
-				//material: this.depthMaterial
-			});
+			viewer.pRenderer.render(viewer.scene.scenePointCloud, camera);
 		}
 
 		{ // ATTRIBUTE PASS
 			for (let pointcloud of visiblePointClouds) {
-				let octreeSize = pointcloud.pcoGeometry.boundingBox.getSize().x;
+				let octreeSize = pointcloud.pcoGeometry.boundingBox.getSize(new THREE.Vector3()).x;
 
 				let material = originalMaterials.get(pointcloud);
 				let attributeMaterial = this.attributeMaterials.get(pointcloud);
@@ -271,11 +275,10 @@ class HQSplatRenderer {
 		viewer.renderer.setViewport(width - viewer.navigationCube.width, 
 									height - viewer.navigationCube.width, 
 									viewer.navigationCube.width, viewer.navigationCube.width);
-		viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);		
+		viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);
 		viewer.renderer.setViewport(0, 0, width, height);
 		
 		viewer.dispatchEvent({type: "render.pass.end",viewer: viewer});
-
 	}
 };
 

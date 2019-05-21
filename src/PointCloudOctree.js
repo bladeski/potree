@@ -99,7 +99,7 @@ Potree.PointCloudOctree = class extends Potree.PointCloudTree {
 		this.pointBudget = Infinity;
 		this.pcoGeometry = geometry;
 		this.boundingBox = this.pcoGeometry.boundingBox;
-		this.boundingSphere = this.boundingBox.getBoundingSphere();
+		this.boundingSphere = this.boundingBox.getBoundingSphere(new THREE.Sphere());
 		this.material = material || new Potree.PointCloudMaterial();
 		this.visiblePointsTarget = 2 * 1000 * 1000;
 		this.minimumNodePixelSize = 150;
@@ -257,7 +257,7 @@ Potree.PointCloudOctree = class extends Potree.PointCloudTree {
 		material.spacing = this.pcoGeometry.spacing * Math.max(this.scale.x, this.scale.y, this.scale.z);
 		material.near = camera.near;
 		material.far = camera.far;
-		material.uniforms.octreeSize.value = this.pcoGeometry.boundingBox.getSize().x;
+		material.uniforms.octreeSize.value = this.pcoGeometry.boundingBox.getSize(new THREE.Vector3()).x;
 	}
 
 	computeVisibilityTextureData(nodes, camera){
@@ -348,11 +348,11 @@ Potree.PointCloudOctree = class extends Potree.PointCloudTree {
 				let bBox = node.getBoundingBox().clone();
 				//bBox.applyMatrix4(node.sceneNode.matrixWorld);
 				//bBox.applyMatrix4(camera.matrixWorldInverse);
-				let bSphere = bBox.getBoundingSphere();
+				let bSphere = bBox.getBoundingSphere(new THREE.Sphere());
 				bSphere.applyMatrix4(node.sceneNode.matrixWorld);
 				bSphere.applyMatrix4(camera.matrixWorldInverse);
 
-				let ray = new THREE.Ray(camera.position, camera.getWorldDirection());
+				let ray = new THREE.Ray(camera.position, camera.getWorldDirection(new THREE.Vector3()));
 				let distance = intersectSphereBack(ray, bSphere);
 				let distance2 = bSphere.center.distanceTo(camera.position) + bSphere.radius;
 				if(distance === null){
@@ -677,7 +677,8 @@ Potree.PointCloudOctree = class extends Potree.PointCloudTree {
 		let pickWindowSize = getVal(params.pickWindowSize, 17);
 		let pickOutsideClipRegion = getVal(params.pickOutsideClipRegion, false);
 
-		let size = renderer.getSize();
+		let size = new THREE.Vector2();
+		renderer.getSize(size);
 
 		let width = Math.ceil(getVal(params.width, size.width));
 		let height = Math.ceil(getVal(params.height, size.height));
@@ -755,7 +756,7 @@ Potree.PointCloudOctree = class extends Potree.PointCloudTree {
 		{ // RENDER
 			renderer.setRenderTarget(pickState.renderTarget);
 			gl.clearColor(0, 0, 0, 0);
-			renderer.clearTarget( pickState.renderTarget, true, true, true );
+			renderer.clear();
 			
 			let tmp = this.material;
 			this.material = pickMaterial;
@@ -778,7 +779,7 @@ Potree.PointCloudOctree = class extends Potree.PointCloudTree {
 		gl.readPixels(x, y, pickWindowSize, pickWindowSize, gl.RGBA, gl.UNSIGNED_BYTE, buffer); 
 		
 		renderer.setRenderTarget(null);
-		renderer.resetGLState();
+		renderer.state.reset();
 		renderer.setScissorTest(false);
 		gl.disable(gl.SCISSOR_TEST);
 		

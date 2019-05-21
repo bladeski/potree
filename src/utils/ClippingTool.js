@@ -1,5 +1,3 @@
-
-
 Potree.ClippingTool = class ClippingTool extends THREE.EventDispatcher{
 
 	constructor(viewer){
@@ -62,7 +60,8 @@ Potree.ClippingTool = class ClippingTool extends THREE.EventDispatcher{
 		if(!type) return null;
 
 		let domElement = this.viewer.renderer.domElement;
-		let canvasSize = this.viewer.renderer.getSize();
+		let canvasSize = new THREE.Vector2();
+		this.viewer.renderer.getSize(canvasSize);
 
 		let svg = $(`
 		<svg height="${canvasSize.height}" width="${canvasSize.width}" style="position:absolute; pointer-events: none">

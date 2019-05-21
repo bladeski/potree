@@ -747,7 +747,7 @@ Potree.TransformationTool = class TransformationTool {
 
 			let center = selected.boundingBox.getCenter().clone().applyMatrix4(selected.matrixWorld);
 
-			this.scene.scale.copy(selected.boundingBox.getSize().multiply(selected.scale));
+			this.scene.scale.copy(selected.boundingBox.getSize(new THREE.Vector3()).multiply(selected.scale));
 			this.scene.position.copy(center);
 			this.scene.rotation.copy(selected.rotation);
 

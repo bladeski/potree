@@ -129,7 +129,7 @@ class RepRenderer {
 			viewer.skybox.camera.fov = viewer.scene.cameraP.fov;
 			viewer.skybox.camera.aspect = viewer.scene.cameraP.aspect;
 			viewer.skybox.camera.updateProjectionMatrix();
-			viewer.renderer.render(viewer.skybox.scene, viewer.skybox.camera);
+			(viewer.skybox.scene, viewer.skybox.camera);
 		} else if (viewer.background === 'gradient') {
 			viewer.renderer.setClearColor(0x000000, 0);
 			viewer.renderer.clear();
@@ -146,15 +146,17 @@ class RepRenderer {
 		
 		viewer.renderer.render(viewer.scene.scene, camera);
 		
-		viewer.renderer.clearTarget( this.rtShadow, true, true, true );
-		viewer.renderer.clearTarget( this.rtColor, true, true, true );
+		viewer.renderer.setRenderTarget(this.rtShadow);
+		viewer.renderer.clear();
+		viewer.renderer.setRenderTarget(this.rtColor);
+		viewer.renderer.clear();
 		
 		let width = viewer.renderArea.clientWidth;
 		let height = viewer.renderArea.clientHeight;
 
 		// COLOR & DEPTH PASS
 		for (let pointcloud of viewer.scene.pointclouds) {
-			let octreeSize = pointcloud.pcoGeometry.boundingBox.getSize().x;
+			let octreeSize = pointcloud.pcoGeometry.boundingBox.getSize(new THREE.Vector3()).x;
 
 			let material = pointcloud.material;
 			material.weighted = false;
@@ -327,9 +329,7 @@ class RepRenderer {
 									viewer.navigationCube.width, viewer.navigationCube.width);
 		viewer.renderer.render(viewer.navigationCube, viewer.navigationCube.camera);		
 		viewer.renderer.setViewport(0, 0, viewer.renderer.domElement.clientWidth, viewer.renderer.domElement.clientHeight);
-
-		//
-
+		viewer.renderer.setRenderTarget(null);
 	}
 };
 

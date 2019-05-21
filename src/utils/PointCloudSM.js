@@ -24,7 +24,8 @@ Potree.PointCloudSM = class PointCloudSM{
 		//});
 
 		this.threeRenderer.setClearColor(0x000000, 1);
-		this.threeRenderer.clearTarget(this.target, true, true, true);
+		this.threeRenderer.setRenderTarget(this.target);
+		this.threeRenderer.clear(true, true, true);
 	}
 
 	setLight(light){
@@ -38,7 +39,7 @@ Potree.PointCloudSM = class PointCloudSM{
 		this.camera.up.set(0, 0, 1);
 		this.camera.position.copy(light.position);
 
-		let target = new THREE.Vector3().addVectors(light.position, light.getWorldDirection());
+		let target = new THREE.Vector3().addVectors(light.position, light.getWorldDirection(new THREE.Vector3()));
 		this.camera.lookAt(target);
 
 		this.camera.updateProjectionMatrix();
@@ -57,8 +58,10 @@ Potree.PointCloudSM = class PointCloudSM{
 	render(scene, camera){
 		//this.threeRenderer.setClearColor(0x00ff00, 1);
 
-		this.threeRenderer.clearTarget( this.target, true, true, true );
-		this.potreeRenderer.render(scene, this.camera, this.target, {});
+		this.threeRenderer.setRenderTarget(this.target);
+		this.threeRenderer.clear();
+		this.potreeRenderer.render(scene, this.camera);
+		this.potreeRenderer.setRenderTarget(null);
 	}
 
 

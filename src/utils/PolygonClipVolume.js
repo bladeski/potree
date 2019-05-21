@@ -1,4 +1,3 @@
-
 Potree.PolygonClipVolume = class extends THREE.Object3D{
 	
 	constructor(camera){
@@ -28,7 +27,8 @@ Potree.PolygonClipVolume = class extends THREE.Object3D{
 		let cancel;
 
 		let drag = e => {
-			let size = e.viewer.renderer.getSize();
+			let size = new THREE.Vector2()
+			e.viewer.renderer.getSize(size);
 			let projectedPos = new THREE.Vector3(
 				2.0 * (e.drag.end.x / size.width) - 1.0,
 				-2.0 * (e.drag.end.y / size.height) + 1.0,

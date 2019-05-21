@@ -213,7 +213,7 @@ Potree.PointCloudArena4D = class PointCloudArena4D extends Potree.PointCloudTree
 		}
 
 		// material.uniforms.octreeSize.value = this.boundingBox.size().x;
-		let bbSize = this.boundingBox.getSize();
+		let bbSize = this.boundingBox.getSize(new THREE.Vector3());
 		material.bbSize = [bbSize.x, bbSize.y, bbSize.z];
 	}
 
@@ -297,7 +297,9 @@ Potree.PointCloudArena4D = class PointCloudArena4D extends Potree.PointCloudTree
 		let pickWindowSize = getVal(params.pickWindowSize, 17);
 		let pickOutsideClipRegion = getVal(params.pickOutsideClipRegion, false);
 
-		let size = renderer.getSize();
+		let size = new THREE.Vector2();
+
+		renderer.getSize(size);
 
 		let width = Math.ceil(getVal(params.width, size.width));
 		let height = Math.ceil(getVal(params.height, size.height));
@@ -372,12 +374,13 @@ Potree.PointCloudArena4D = class PointCloudArena4D extends Potree.PointCloudTree
 		renderer.state.buffers.depth.setMask(pickMaterial.depthWrite);
 		renderer.state.setBlending(THREE.NoBlending);
 
-		renderer.clearTarget(pickState.renderTarget, true, true, true);
+		renderer.setRenderTarget(pickState.renderTarget);
+		renderer.clear();
 
 		{ // RENDER
 			renderer.setRenderTarget(pickState.renderTarget);
 			gl.clearColor(0, 0, 0, 0);
-			renderer.clearTarget( pickState.renderTarget, true, true, true );
+			renderer.clear();
 			
 			let tmp = this.material;
 			this.material = pickMaterial;
@@ -400,7 +403,7 @@ Potree.PointCloudArena4D = class PointCloudArena4D extends Potree.PointCloudTree
 		gl.readPixels(x, y, pickWindowSize, pickWindowSize, gl.RGBA, gl.UNSIGNED_BYTE, buffer); 
 		
 		renderer.setRenderTarget(null);
-		renderer.resetGLState();
+		renderer.state.reset();
 		renderer.setScissorTest(false);
 		gl.disable(gl.SCISSOR_TEST);
 		
