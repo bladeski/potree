@@ -145,7 +145,9 @@ class HQSplatRenderer {
 				pointcloud.material = depthMaterial;
 			}
 			
-			viewer.pRenderer.render(viewer.scene.scenePointCloud, camera);
+			viewer.pRenderer.render(viewer.scene.scenePointCloud, camera, this.rtDepth, {
+				material: this.depthMaterial
+			});
 		}
 
 		{ // ATTRIBUTE PASS

@@ -192,6 +192,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 			this.scaleFactor = 1;
 
 			this.loadSettingsFromURL();
+			this.isRendering = true;
 		}
 
 		// start rendering!
@@ -203,6 +204,16 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 
 		}catch(e){
 			this.onCrash(e);
+		}
+	}
+
+	setRenderStatus(status) {
+
+		if (status === true && !this.isRendering) {
+			this.isRendering = status;
+			requestAnimationFrame(this.loop.bind(this));
+		} else if (!status) {
+			this.isRendering = false;
 		}
 	}
 
@@ -1572,7 +1583,8 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 		}
 	}
 
-	loop(timestamp){
+	loop(timestamp) {
+		if (!this.isRendering) return;
 		requestAnimationFrame(this.loop.bind(this));
 
 		let queryAll;
