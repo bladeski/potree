@@ -804,6 +804,14 @@ Potree.ProfileWindow = class ProfileWindow extends THREE.EventDispatcher {
 
 			this.renderer.setSize(width, height);
 
+			// Ensure no scale value is set to 0 (see: https://discourse.threejs.org/t/cant-get-the-animation-to-work-three-matrix3-getinverse-cant-invert-matrix-determinant-is-0/5249)
+			this.scene.children.forEach(c => {
+				const scale = c.getWorldScale(new THREE.Vector3());
+				const fixedScale = {};
+				Object.keys(scale).forEach(k => fixedScale[k] = scale[k] !== 0 ? scale[k] : 0.001);
+				c.scale.set(fixedScale.x, fixedScale.y, fixedScale.z);
+			});
+
 			this.renderer.render(this.scene, this.camera);
 			this.renderer.setRenderTarget(null);
 		}
