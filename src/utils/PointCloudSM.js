@@ -61,7 +61,6 @@ Potree.PointCloudSM = class PointCloudSM{
 		this.threeRenderer.setRenderTarget(this.target);
 		this.threeRenderer.clear();
 		this.potreeRenderer.render(scene, this.camera);
-		this.potreeRenderer.setRenderTarget(null);
 	}
 
 

@@ -110,7 +110,7 @@ Potree.Volume = class extends THREE.Object3D {
 
 	update () {
 		this.boundingBox = this.box.geometry.boundingBox;
-		this.boundingSphere = this.boundingBox.getBoundingSphere();
+		this.boundingSphere = this.boundingBox.getBoundingSphere(new THREE.Sphere());
 
 		if (this._clip) {
 			this.box.visible = false;

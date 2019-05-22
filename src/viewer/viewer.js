@@ -1021,7 +1021,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 			}
 
 			let distance = viewer.scene.cameraP.position.distanceTo(position);
-			let radius = annotation.boundingBox.getBoundingSphere().radius;
+			let radius = annotation.boundingBox.getBoundingSphere(new THREE.Sphere()).radius;
 
 			let screenPos = new THREE.Vector3();
 			let screenSize = 0;
@@ -1328,10 +1328,18 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 				boxes.push(...profile.boxes);
 			}
 			
-			let clipBoxes = boxes.map( box => {
+			let clipBoxes = boxes.map(box => {
+				const scale = box.getWorldScale(new THREE.Vector3());
+				const fixedScale = {};
+				Object.keys(scale).forEach(k => fixedScale[k] = scale[k] === 0 ? 0.0001 : scale[k]);
+
+				if (scale !== fixedScale) {
+					box.scale.set(fixedScale.x, fixedScale.y, fixedScale.z);
+				}
+
 				box.updateMatrixWorld();
 				let boxInverse = new THREE.Matrix4().getInverse(box.matrixWorld);
-				let boxPosition = box.getWorldPosition();
+				let boxPosition = box.getWorldPosition(new THREE.Vector3());
 				return {box: box, inverse: boxInverse, position: boxPosition};
 			});
 

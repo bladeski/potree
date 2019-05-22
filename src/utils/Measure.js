@@ -72,7 +72,7 @@ Potree.Measure = class Measure extends THREE.Object3D {
 
 	createSphereMaterial () {
 		let sphereMaterial = new THREE.MeshLambertMaterial({
-			shading: THREE.SmoothShading,
+			flatShading: true,
 			color: this.color,
 			depthTest: false,
 			depthWrite: false}

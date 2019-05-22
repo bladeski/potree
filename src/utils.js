@@ -147,7 +147,7 @@ Potree.utils = class {
 			let camTargetDistance = camera.position.distanceTo(endTarget);
 			let target = new THREE.Vector3().addVectors(
 				camera.position,
-				camera.getWorldDirection().clone().multiplyScalar(camTargetDistance)
+				camera.getWorldDirection(new THREE.Vector3()).clone().multiplyScalar(camTargetDistance)
 			);
 			let tween = new TWEEN.Tween(target).to(endTarget, animationDuration);
 			tween.easing(easing);
